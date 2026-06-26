@@ -44,8 +44,8 @@ const experienceItems = [
 ];
 
 function App() {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLElement>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const trackRef = useRef<HTMLElement | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
