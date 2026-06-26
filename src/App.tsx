@@ -3,38 +3,42 @@ import { gsap } from 'gsap';
 
 type Work = {
   title: string;
-  categories: string;
+  categories: string[];
   year: string;
   summary: string;
+  scope: string;
   image: string;
 };
 
 const works: Work[] = [
   {
     title: 'Brand Identity Concept',
-    categories: 'Brand．Visual',
+    categories: ['Brand', 'Visual'],
     year: '2024',
-    summary: 'A refined brand identity concept built around minimal typography and a calm visual system.',
-    image: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1400&auto=format&fit=crop',
+    summary: 'A calm identity study built with restrained typography, consistent spacing, and a quiet visual system.',
+    scope: 'Identity system / art direction / layout rules',
+    image: 'https://images.unsplash.com/photo-1600132806370-bf17e65e942f?q=80&w=1600&auto=format&fit=crop',
   },
   {
     title: 'Editorial Layout',
-    categories: 'Visual',
+    categories: ['Visual'],
     year: '2024',
-    summary: 'An editorial layout study exploring spacious grids, refined hierarchy, and quiet image pacing.',
-    image: 'https://images.unsplash.com/photo-1549468057-5b7fa1a41d7a?q=80&w=1400&auto=format&fit=crop',
+    summary: 'An editorial composition study focused on hierarchy, image rhythm, and refined page pacing.',
+    scope: 'Print layout / type hierarchy / image direction',
+    image: 'https://images.unsplash.com/photo-1549468057-5b7fa1a41d7a?q=80&w=1600&auto=format&fit=crop',
   },
   {
     title: 'Digital Platform UI',
-    categories: 'Web UI',
+    categories: ['Web UI'],
     year: '2024',
-    summary: 'A clean and airy interface concept for a modern digital commerce experience.',
-    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=1400&auto=format&fit=crop',
+    summary: 'A reduced interface concept for a digital commerce experience, shaped around clarity and calm navigation.',
+    scope: 'Web UI / interaction flow / component rhythm',
+    image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?q=80&w=1600&auto=format&fit=crop',
   },
 ];
 
 const categories = ['All', 'Brand', 'Social Media', 'Logo', 'Web UI', 'Visual'];
-const menuItems = ['Home', 'About', 'Work', 'Contact'];
+const menuItems = ['Home', 'Approach', 'About', 'Work', 'Contact'];
 const experienceItems = [
   ['2019-2021', 'Packaging'],
   ['2021-2022', 'Product & Visual'],
@@ -43,10 +47,39 @@ const experienceItems = [
   ['2024-Present', 'Brand, Marketing & UI'],
 ];
 
+const practiceItems = [
+  {
+    title: 'Brand structure',
+    body: 'Identity systems, visual language, usage rules, and quiet marks that can grow across formats.',
+  },
+  {
+    title: 'Printed matter',
+    body: 'Packaging, editorial pages, campaign prints, and production-aware details for physical touchpoints.',
+  },
+  {
+    title: 'Digital experience',
+    body: 'Web UI, portfolio systems, interaction rhythm, and interface layouts with clear hierarchy.',
+  },
+];
+
+const principles = [
+  'Whitespace is treated as structure, not decoration.',
+  'Typography is used to control speed, weight, and silence.',
+  'Images are paced as objects, not filler between text blocks.',
+  'Every composition should feel intentional before it feels expressive.',
+];
+
 function App() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLElement | null>(null);
+  const targetScrollRef = useRef(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const filteredWorks =
+    selectedCategory === 'All'
+      ? works
+      : works.filter((work) => work.categories.includes(selectedCategory));
 
   useEffect(() => {
     const root = rootRef.current;
@@ -59,8 +92,8 @@ function App() {
     }
 
     const ctx = gsap.context(() => {
-      gsap.set('[data-reveal]', { y: 28, opacity: 0, filter: 'blur(9px)' });
-      gsap.set('[data-image-reveal]', { clipPath: 'inset(0 0 100% 0)', scale: 1.07 });
+      gsap.set('[data-reveal]', { y: 34, opacity: 0, filter: 'blur(10px)' });
+      gsap.set('[data-image-reveal]', { clipPath: 'inset(0 0 100% 0)', scale: 1.06 });
       gsap
         .timeline({ defaults: { ease: 'power3.out' } })
         .to(root, { opacity: 1, duration: 0.08 })
@@ -68,18 +101,18 @@ function App() {
           y: 0,
           opacity: 1,
           filter: 'blur(0px)',
-          duration: 1.1,
-          stagger: 0.075,
+          duration: 1.05,
+          stagger: 0.055,
         })
         .to(
           '[data-image-reveal]',
           {
             clipPath: 'inset(0 0 0% 0)',
             scale: 1,
-            duration: 1.35,
-            stagger: 0.08,
+            duration: 1.28,
+            stagger: 0.06,
           },
-          0.22,
+          0.18,
         )
         .add(() => root.classList.add('is-ready'));
     }, root);
@@ -91,11 +124,24 @@ function App() {
     const track = trackRef.current;
     if (!track) return;
 
+    targetScrollRef.current = track.scrollLeft;
+
     const handleWheel = (event: WheelEvent) => {
-      if (!window.matchMedia('(min-width: 1024px)').matches) return;
+      const isDesktop = window.matchMedia('(min-width: 1181px) and (hover: hover) and (pointer: fine)').matches;
+      if (!isDesktop) return;
       if (Math.abs(event.deltaY) < Math.abs(event.deltaX)) return;
+
       event.preventDefault();
-      track.scrollLeft += event.deltaY * 1.12;
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const next = Math.max(0, Math.min(maxScroll, targetScrollRef.current + event.deltaY * 1.18));
+      targetScrollRef.current = next;
+
+      gsap.to(track, {
+        scrollLeft: next,
+        duration: 0.72,
+        ease: 'power3.out',
+        overwrite: true,
+      });
     };
 
     track.addEventListener('wheel', handleWheel, { passive: false });
@@ -104,14 +150,15 @@ function App() {
 
   useEffect(() => {
     document.body.classList.toggle('menu-open', menuOpen);
+    return () => document.body.classList.remove('menu-open');
   }, [menuOpen]);
 
   return (
     <div className="site-shell" ref={rootRef}>
       <div className="ambient-noise" aria-hidden="true" />
       <header className="site-header" data-reveal>
-        <a className="brand-mark" href="#home" aria-label="H. in Design home">
-          H.
+        <a className="brand-wordmark" href="#home" aria-label="H. in Design home">
+          H. IN DESIGN
         </a>
         <button
           className="menu-button"
@@ -120,50 +167,77 @@ function App() {
           aria-controls="site-menu"
           onClick={() => setMenuOpen((open) => !open)}
         >
-          <span className="menu-dot" aria-hidden="true" />
           <span>{menuOpen ? 'Close' : 'Menu'}</span>
+          <span className="menu-line" aria-hidden="true" />
         </button>
       </header>
 
       <main className="gallery-track" id="home" ref={trackRef}>
         <section className="panel hero-panel" aria-labelledby="hero-title">
-          <div className="hero-grid">
+          <div className="hero-composition">
             <p className="vertical-line hero-jp" data-reveal>
               簡約と秩序で、静かな識別をつくる。
             </p>
+            <div className="hero-kicker" data-reveal>
+              Graphic design / identity / digital experience
+            </div>
+            <h1 id="hero-title" className="hero-title" data-reveal>
+              Quiet form for clear recognition.
+            </h1>
             <div className="hero-statement" data-reveal>
               <p>以簡約與秩序定義品牌辨識，</p>
               <p>用結構與細節塑造視覺識別。</p>
               <p>Define brand recognition through simplicity and order, shape visual identity through structure and detail.</p>
             </div>
-            <h1 id="hero-title" className="hero-title" data-reveal>
-              H. IN DESIGN
-            </h1>
           </div>
-          <figure className="hero-strip" data-image-reveal>
+          <figure className="hero-media" data-image-reveal>
             <img
-              src="https://picsum.photos/seed/hin-quiet-water/900/1500"
-              alt="Quiet monochrome water texture"
+              src="https://picsum.photos/seed/hin-paper-light/1000/1400"
+              alt="Soft monochrome texture study"
             />
           </figure>
         </section>
 
-        <section className="panel atmosphere-panel" aria-label="Atmosphere image">
+        <section className="panel approach-panel" id="approach" aria-labelledby="approach-title">
+          <div className="panel-index" data-reveal>Approach</div>
+          <div className="approach-writing">
+            <h2 id="approach-title" data-reveal>
+              A portfolio shaped like a quiet sequence.
+            </h2>
+            <p data-reveal>
+              The site is treated as a slow walk through identity, print, and interface work. Each section keeps one clear role, so the viewer can read the work without visual noise.
+            </p>
+          </div>
+          <ul className="principle-list" aria-label="Design principles">
+            {principles.map((principle) => (
+              <li key={principle} data-reveal>{principle}</li>
+            ))}
+          </ul>
+        </section>
+
+        <section className="panel image-panel" aria-label="Visual atmosphere">
           <figure className="atmosphere-image" data-image-reveal>
             <img
-              src="https://picsum.photos/seed/hin-archive-atmosphere/1900/1200"
-              alt="Monochrome atmosphere study"
+              src="https://picsum.photos/seed/hin-archive-atmosphere/1800/1200"
+              alt="Quiet archive-like monochrome composition"
             />
           </figure>
+          <p className="image-note" data-reveal>
+            Visual rhythm is held by contrast, negative space, and the distance between objects.
+          </p>
         </section>
 
         <section className="panel about-panel" id="about" aria-labelledby="about-title">
-          <aside className="panel-label" data-reveal>
-            About
-          </aside>
+          <div className="panel-index" data-reveal>About</div>
+          <figure className="portrait-frame" data-image-reveal>
+            <img
+              src="https://raw.githubusercontent.com/g5660778995-collab/H.-In-Design/main/public/images/profile-photo.webp"
+              alt="Chien Hung Fang portrait"
+            />
+          </figure>
           <div className="about-writing">
             <h2 id="about-title" data-reveal>
-              方謙鴻 Chris Fang
+              Chien Hung Fang
             </h2>
             <div className="copy-columns">
               <div data-reveal>
@@ -190,51 +264,71 @@ function App() {
               </div>
             </div>
           </div>
-          <figure className="portrait-frame" data-image-reveal>
-            <img src="https://raw.githubusercontent.com/g5660778995-collab/H.-In-Design/main/public/images/profile-photo.webp" alt="Chien Hung Fang portrait" />
-          </figure>
+        </section>
+
+        <section className="panel practice-panel" aria-labelledby="practice-title">
+          <div className="panel-index" data-reveal>Practice</div>
+          <h2 id="practice-title" data-reveal>
+            Work is organized through structure before style.
+          </h2>
+          <div className="practice-grid">
+            {practiceItems.map((item) => (
+              <article className="practice-item" key={item.title} data-reveal>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            ))}
+          </div>
         </section>
 
         <section className="panel experience-panel" aria-labelledby="experience-title">
-          <aside className="panel-label" data-reveal>
-            Experience
-          </aside>
-          <div className="experience-list" id="experience-title">
-            {experienceItems.map(([year, role]) => (
-              <div className="experience-row" key={`${year}-${role}`} data-reveal>
-                <span>{year}</span>
-                <span>{role}</span>
-              </div>
-            ))}
+          <div className="panel-index" data-reveal>Experience</div>
+          <div className="experience-wrap">
+            <h2 id="experience-title" data-reveal>
+              From print production to digital interface systems.
+            </h2>
+            <div className="experience-list">
+              {experienceItems.map(([year, role]) => (
+                <div className="experience-row" key={`${year}-${role}`} data-reveal>
+                  <span>{year}</span>
+                  <span>{role}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </section>
 
         <section className="panel work-panel" id="work" aria-labelledby="work-title">
-          <aside className="panel-label" data-reveal>
-            Work
-          </aside>
-          <div className="category-rail" aria-label="Work categories" data-reveal>
-            {categories.map((category) => (
-              <button key={category} type="button">
-                {category}
-              </button>
-            ))}
-          </div>
-          <div className="work-stage">
-            <h2 id="work-title" className="sr-only">
-              Selected work
+          <div className="panel-index" data-reveal>Work</div>
+          <div className="work-intro">
+            <h2 id="work-title" data-reveal>
+              Selected studies in identity, print, and web UI.
             </h2>
-            {works.map((work, index) => (
+            <div className="category-rail" aria-label="Work categories" data-reveal>
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  type="button"
+                  className={selectedCategory === category ? 'is-active' : ''}
+                  onClick={() => setSelectedCategory(category)}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="work-stage" aria-live="polite">
+            {filteredWorks.map((work, index) => (
               <article className="work-item" key={work.title} data-reveal>
                 <a href="#contact" aria-label={`${work.title} project preview`}>
-                  <span className="work-number">0{index + 1}</span>
                   <figure data-image-reveal>
                     <img src={work.image} alt={`${work.title} preview`} />
                   </figure>
                   <div className="work-copy">
-                    <p>{work.year} {work.categories}</p>
+                    <p>{work.year} {work.categories.join('．')}</p>
                     <h3>{work.title}</h3>
                     <span>{work.summary}</span>
+                    <small>{String(index + 1).padStart(2, '0')} / {work.scope}</small>
                   </div>
                 </a>
               </article>
@@ -247,9 +341,13 @@ function App() {
             余白、構成、視線の速度。
           </p>
           <div className="contact-copy">
+            <div className="panel-index" data-reveal>Contact</div>
             <h2 id="contact-title" data-reveal>
-              For identity, print and web projects.
+              For identity, print, and web projects.
             </h2>
+            <p data-reveal>
+              If the project needs calm hierarchy, careful spacing, and visual systems that can last across formats, let us begin with a conversation.
+            </p>
             <dl data-reveal>
               <div>
                 <dt>Phone</dt>
