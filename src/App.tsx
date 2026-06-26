@@ -318,21 +318,28 @@ function App() {
             </div>
           </div>
           <div className="work-stage" aria-live="polite">
-            {filteredWorks.map((work, index) => (
-              <article className="work-item" key={work.title} data-reveal>
-                <a href="#contact" aria-label={`${work.title} project preview`}>
-                  <figure data-image-reveal>
-                    <img src={work.image} alt={`${work.title} preview`} />
-                  </figure>
-                  <div className="work-copy">
-                    <p>{work.year} {work.categories.join('．')}</p>
-                    <h3>{work.title}</h3>
-                    <span>{work.summary}</span>
-                    <small>{String(index + 1).padStart(2, '0')} / {work.scope}</small>
-                  </div>
-                </a>
-              </article>
-            ))}
+            {filteredWorks.length > 0 ? (
+              filteredWorks.map((work, index) => (
+                <article className="work-item" key={work.title} data-reveal>
+                  <a href="#contact" aria-label={`${work.title} project preview`}>
+                    <figure data-image-reveal>
+                      <img src={work.image} alt={`${work.title} preview`} />
+                    </figure>
+                    <div className="work-copy">
+                      <p>{work.year} {work.categories.join('．')}</p>
+                      <h3>{work.title}</h3>
+                      <span>{work.summary}</span>
+                      <small>{String(index + 1).padStart(2, '0')} / {work.scope}</small>
+                    </div>
+                  </a>
+                </article>
+              ))
+            ) : (
+              <div className="work-empty" data-reveal>
+                <p>No published work in this category yet.</p>
+                <span>New case studies can be added when the portfolio content is ready.</span>
+              </div>
+            )}
           </div>
         </section>
 
